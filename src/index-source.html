@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0c2238" />
+  <title>Aloeworld Safety Plan 360</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <noscript><div class="fatal-banner">Ative o JavaScript para utilizar o editor.</div></noscript>
+  <div id="runtimeError" class="fatal-banner hidden" role="alert"></div>
+  <script>window.addEventListener('error',function(e){var b=document.getElementById('runtimeError');if(b){b.textContent='Erro ao iniciar o editor: '+(e.message||'erro desconhecido');b.classList.remove('hidden');}});</script>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand" aria-label="Aloeworld Safety Plan 360">
+        <div class="brand-mark">A</div>
+        <div>
+          <strong>ALOEWORLD</strong>
+          <span>Safety Plan 360</span>
+        </div>
+      </div>
+
+      <div class="document-title-wrap">
+        <input id="documentTitle" value="Plano de Emergência e Evacuação" aria-label="Título do documento" />
+      </div>
+
+      <nav class="top-actions" aria-label="Ações do documento">
+        <button id="newBtn" title="Novo (Ctrl+N)">Novo</button>
+        <button id="openBtn" title="Abrir ficheiro">Abrir</button>
+        <button id="saveBtn" title="Guardar projeto (Ctrl+S)">Guardar</button>
+        <button id="undoBtn" class="icon-btn" title="Desfazer (Ctrl+Z)">↶</button>
+        <button id="redoBtn" class="icon-btn" title="Refazer (Ctrl+Y)">↷</button>
+        <button id="templatesBtn">Modelos</button>
+        <div class="dropdown">
+          <button id="exportBtn" class="primary">Exportar ▾</button>
+          <div id="exportMenu" class="dropdown-menu hidden">
+            <button data-export="png">Imagem PNG</button>
+            <button data-export="svg">Vetor SVG</button>
+            <button data-export="pdf">PDF / Imprimir</button>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <div class="workspace">
+      <aside class="left-panel">
+        <div class="panel-tabs">
+          <button class="tab active" data-tab="tools">Ferramentas</button>
+          <button class="tab" data-tab="symbols">Símbolos</button>
+        </div>
+
+        <section id="toolsTab" class="tab-content active">
+          <div class="tool-grid" id="toolGrid">
+            <button class="tool active" data-tool="select" title="Selecionar (V)"><span>↖</span>Selecionar</button>
+            <button class="tool" data-tool="pan" title="Mover a vista (H)"><span>✋</span>Mão</button>
+            <button class="tool" data-tool="wall" title="Desenhar parede (W)"><span>━</span>Parede</button>
+            <button class="tool" data-tool="room" title="Desenhar divisão (R)"><span>▭</span>Divisão</button>
+            <button class="tool" data-tool="door" title="Adicionar porta (D)"><span>◔</span>Porta</button>
+            <button class="tool" data-tool="window" title="Adicionar janela"><span>▥</span>Janela</button>
+            <button class="tool" data-tool="route" title="Rota de evacuação (E)"><span>➜</span>Rota</button>
+            <button class="tool" data-tool="dimension" title="Cota (M)"><span>↔</span>Cota</button>
+            <button class="tool" data-tool="text" title="Texto (T)"><span>T</span>Texto</button>
+            <button class="tool" data-tool="image" title="Inserir imagem"><span>▧</span>Imagem</button>
+          </div>
+
+          <div class="panel-section">
+            <h3>Página</h3>
+            <label>Formato
+              <select id="pageFormat">
+                <option value="a4-landscape">A4 horizontal</option>
+                <option value="a4-portrait">A4 vertical</option>
+                <option value="a3-landscape">A3 horizontal</option>
+                <option value="a3-portrait">A3 vertical</option>
+                <option value="custom">Personalizado</option>
+              </select>
+            </label>
+            <div class="two-cols">
+              <label>Largura<input id="pageWidth" type="number" min="200" value="1123" /></label>
+              <label>Altura<input id="pageHeight" type="number" min="200" value="794" /></label>
+            </div>
+            <label>Escala de medição
+              <select id="drawingScale">
+                <option value="25">1:25</option>
+                <option value="50" selected>1:50</option>
+                <option value="100">1:100</option>
+                <option value="200">1:200</option>
+              </select>
+            </label>
+            <label class="switch-row"><input id="gridToggle" type="checkbox" checked /><span>Mostrar grelha</span></label>
+            <label class="switch-row"><input id="snapToggle" type="checkbox" checked /><span>Ajustar à grelha</span></label>
+          </div>
+
+          <div class="panel-section">
+            <h3>Vista</h3>
+            <div class="zoom-row">
+              <button id="zoomOut">−</button>
+              <span id="zoomLabel">100%</span>
+              <button id="zoomIn">+</button>
+              <button id="fitBtn">Ajustar</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="symbolsTab" class="tab-content">
+          <div class="symbol-search-wrap">
+            <input id="symbolSearch" placeholder="Pesquisar símbolos…" />
+          </div>
+          <div id="symbolLibrary" class="symbol-library"></div>
+          <p class="drag-help">Arraste um símbolo para a planta ou clique para o inserir no centro.</p>
+        </section>
+      </aside>
+
+      <main class="canvas-area">
+        <div id="canvasToolbar" class="canvas-toolbar">
+          <span id="activeToolLabel">Selecionar</span>
+          <span class="hint">Rato: roda = zoom · botão central = mover · Delete = apagar</span>
+        </div>
+        <div id="stageWrapper" class="stage-wrapper" tabindex="0">
+          <svg id="canvas" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Editor do plano de emergência">
+            <defs>
+              <pattern id="minorGrid" width="10" height="10" patternUnits="userSpaceOnUse">
+                <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#e8edf2" stroke-width="0.7" />
+              </pattern>
+              <pattern id="majorGrid" width="50" height="50" patternUnits="userSpaceOnUse">
+                <rect width="50" height="50" fill="url(#minorGrid)" />
+                <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#ccd6df" stroke-width="1" />
+              </pattern>
+              <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#159447" />
+              </marker>
+              <marker id="arrowBlack" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#24313d" />
+              </marker>
+              <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.2" />
+              </filter>
+            </defs>
+            <g id="viewport">
+              <rect id="pageBackground" x="0" y="0" width="1123" height="794" fill="#ffffff" />
+              <rect id="gridLayer" x="0" y="0" width="1123" height="794" fill="url(#majorGrid)" />
+              <g id="drawingLayer"></g>
+              <g id="previewLayer" pointer-events="none"></g>
+              <g id="selectionLayer" pointer-events="none"></g>
+            </g>
+          </svg>
+          <div id="emptyState" class="empty-state hidden">
+            <strong>Comece por um modelo</strong>
+            <span>ou desenhe paredes, divisões e rotas de evacuação.</span>
+          </div>
+        </div>
+        <footer class="statusbar">
+          <span id="cursorPosition">X: 0,00 m · Y: 0,00 m</span>
+          <span id="selectionStatus">Nenhum objeto selecionado</span>
+          <span id="autosaveStatus">Guardado localmente</span>
+        </footer>
+      </main>
+
+      <aside class="right-panel">
+        <div class="right-header">
+          <h2>Propriedades</h2>
+          <button id="closeProps" title="Limpar seleção">×</button>
+        </div>
+        <div id="noSelection" class="no-selection">
+          <div class="no-selection-icon">◇</div>
+          <p>Selecione um elemento para editar posição, dimensão, rotação, cores e texto.</p>
+        </div>
+        <form id="propertiesForm" class="properties-form hidden" onsubmit="return false;">
+          <label>Tipo<input id="propType" disabled /></label>
+          <label>Nome<input id="propName" /></label>
+          <div class="two-cols">
+            <label>X<input id="propX" type="number" step="1" /></label>
+            <label>Y<input id="propY" type="number" step="1" /></label>
+          </div>
+          <div class="two-cols">
+            <label>Largura<input id="propW" type="number" min="1" /></label>
+            <label>Altura<input id="propH" type="number" min="1" /></label>
+          </div>
+          <label>Rotação<input id="propRotation" type="number" min="-360" max="360" /></label>
+          <div class="two-cols">
+            <label>Contorno<input id="propStroke" type="color" /></label>
+            <label>Preenchimento<input id="propFill" type="color" /></label>
+          </div>
+          <label>Espessura<input id="propStrokeWidth" type="number" min="0" max="50" step="1" /></label>
+          <label>Opacidade<input id="propOpacity" type="range" min="0.1" max="1" step="0.05" /></label>
+          <label id="textPropWrap">Texto<textarea id="propText" rows="4"></textarea></label>
+          <label class="switch-row"><input id="propLocked" type="checkbox" /><span>Bloquear elemento</span></label>
+          <div class="properties-actions">
+            <button id="duplicateBtn" type="button">Duplicar</button>
+            <button id="deleteBtn" type="button" class="danger">Apagar</button>
+          </div>
+          <div class="properties-actions">
+            <button id="frontBtn" type="button">Para a frente</button>
+            <button id="backBtn" type="button">Para trás</button>
+          </div>
+        </form>
+      </aside>
+    </div>
+  </div>
+
+  <input id="projectFileInput" class="hidden" type="file" accept=".json,.asp360" />
+  <input id="imageFileInput" class="hidden" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" />
+
+  <dialog id="templatesDialog" class="templates-dialog">
+    <div class="dialog-header">
+      <div><strong>Modelos de plano</strong><span>Escolha uma base totalmente editável.</span></div>
+      <button id="closeTemplates" aria-label="Fechar">×</button>
+    </div>
+    <div class="template-grid">
+      <button class="template-card" data-template="office">
+        <div class="template-preview office-preview"></div>
+        <strong>Escritório</strong><span>Gabinetes, sala e duas saídas</span>
+      </button>
+      <button class="template-card" data-template="home">
+        <div class="template-preview home-preview"></div>
+        <strong>Habitação</strong><span>Quartos, cozinha e ponto de encontro</span>
+      </button>
+      <button class="template-card" data-template="warehouse">
+        <div class="template-preview warehouse-preview"></div>
+        <strong>Armazém</strong><span>Zona ampla, equipamentos e circulação</span>
+      </button>
+      <button class="template-card" data-template="blank">
+        <div class="template-preview blank-preview">+</div>
+        <strong>Em branco</strong><span>Começar do zero</span>
+      </button>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast hidden" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
